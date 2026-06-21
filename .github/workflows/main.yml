@@ -26,17 +26,28 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Paso 3: Build imagen Docker
+      # Paso 3: Generar application.yml dinámico (ANTES DEL BUILD)
+      - name: Generate application.yml
+        run: |
+          mkdir -p src/main/resources
+          cat <<EOF > src/main/resources/application.yml
+          aws:
+            accessKey: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            secretKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            region: ${{ secrets.AWS_REGION }}
+          EOF
+
+      # Paso 4: Build imagen Docker
       - name: Build Docker Image
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest .
 
-      # Paso 4: Push DockerHub
+      # Paso 5: Push DockerHub
       - name: Push Docker Image
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
 
-      # Paso 5: AWS Credentials
+      # Paso 6: AWS Credentials
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -45,14 +56,14 @@ jobs:
           aws-region: us-east-1
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
 
-      # Paso 6: SSH Key
+      # Paso 7: SSH Key
       - name: Add SSH Key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      # Paso 7: Deploy EC2
+      # Paso 8: Deploy EC2
       - name: SSH commands to deploy
         run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.USER_SERVER }}@${{ secrets.EC2_HOST }} << 'EOF'
