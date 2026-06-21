@@ -1,0 +1,6 @@
+RESUMEN INSCRIPCION
+
+ID: 3
+Estudiante: María González
+Cursos: Java Básico
+Total: $45000.0

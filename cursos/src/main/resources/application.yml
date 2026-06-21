@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: cursos
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/cursos_db
+    username: root
+    password: 2785030
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+server:
+  port: 8080
+
+cloud:
+  aws:
+    credentials:
+      access-key: 
+      secret-key: 
+      session-token: 
+    region:
+      static: us-east-1
+
+app:
+  bucket-name: mibucketduocs3ccp
