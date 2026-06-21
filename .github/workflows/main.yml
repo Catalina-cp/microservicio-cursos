@@ -27,7 +27,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # Paso 3: Generar application.yml dinámico (ANTES DEL BUILD)
-      - - name: Generate application.yml
+      - name: Generate application.yml
         run: |
           mkdir -p src/main/resources
           cat <<EOF > src/main/resources/application.yml
