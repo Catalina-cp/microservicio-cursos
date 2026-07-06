@@ -1,0 +1,6 @@
+RESUMEN INSCRIPCION
+
+ID: 6
+Estudiante: Pedro Sánchez
+Cursos: Java Básico, Programación en Java
+Total: $100000.0

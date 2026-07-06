@@ -1,0 +1,6 @@
+RESUMEN INSCRIPCION
+
+ID: 9
+Estudiante: Carlos Mendoza
+Cursos: Java Básico
+Total: $45000.0

@@ -1,4 +1,4 @@
-spring:
+﻿spring:
   application:
     name: cursos
 
@@ -12,17 +12,29 @@ spring:
       ddl-auto: update
     show-sql: true
 
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
 server:
   port: 8080
 
 cloud:
   aws:
     credentials:
-      access-key: 
-      secret-key: 
-      session-token: 
+      access-key:
+      secret-key:
+      session-token:
     region:
       static: us-east-1
 
 app:
   bucket-name: mibucketduocs3ccp
+  h2:
+    datasource:
+      url: jdbc:h2:file:./data/resumen_compra_db
+      username: sa
+      password:
+      driver-class-name: org.h2.Driver

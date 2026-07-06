@@ -1,0 +1,6 @@
+RESUMEN INSCRIPCION
+
+ID: 5
+Estudiante: Maria Lopez
+Cursos: Desarrollo Web, Programación en Java
+Total: $120000.0

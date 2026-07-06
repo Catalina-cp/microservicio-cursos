@@ -1,0 +1,6 @@
+RESUMEN INSCRIPCION
+
+ID: 8
+Estudiante: Ana Torres
+Cursos: Java Básico, Desarrollo Web
+Total: $110000.0

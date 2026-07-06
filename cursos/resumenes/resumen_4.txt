@@ -1,0 +1,6 @@
+RESUMEN INSCRIPCION
+
+ID: 4
+Estudiante: Juan Perez
+Cursos: Java Básico, Desarrollo Web
+Total: $110000.0

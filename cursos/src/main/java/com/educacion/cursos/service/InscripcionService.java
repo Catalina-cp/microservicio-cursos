@@ -5,7 +5,6 @@ import com.educacion.cursos.entity.Curso;
 import com.educacion.cursos.entity.Inscripcion;
 import com.educacion.cursos.repository.CursoRepository;
 import com.educacion.cursos.repository.InscripcionRepository;
-
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,15 +15,18 @@ public class InscripcionService {
     private final CursoRepository cursoRepository;
     private final InscripcionRepository inscripcionRepository;
     private final ArchivoService archivoService;
+    private final ProductorService productorService;
 
     public InscripcionService(
             CursoRepository cursoRepository,
             InscripcionRepository inscripcionRepository,
-            ArchivoService archivoService) {
+            ArchivoService archivoService,
+            ProductorService productorService) {
 
         this.cursoRepository = cursoRepository;
         this.inscripcionRepository = inscripcionRepository;
         this.archivoService = archivoService;
+        this.productorService = productorService;
     }
 
     public Inscripcion inscribir(InscripcionDTO dto) {
@@ -42,7 +44,6 @@ public class InscripcionService {
                 .orElse("");
 
         Inscripcion inscripcion = new Inscripcion();
-
         inscripcion.setEstudiante(dto.getEstudiante());
         inscripcion.setCursos(nombresCursos);
         inscripcion.setTotal(total);
@@ -51,6 +52,9 @@ public class InscripcionService {
                 inscripcionRepository.save(inscripcion);
 
         archivoService.generarResumen(guardada);
+
+        // Semana 7: enviamos el resumen de la inscripcion a la cola MQ
+        productorService.enviarResumenInscripcion(guardada);
 
         return guardada;
     }
