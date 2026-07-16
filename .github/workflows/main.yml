@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+﻿name: Build and Push Docker Image
 
 on:
   push:
@@ -15,49 +15,23 @@ jobs:
 
     steps:
 
-      # Paso 1: Checkout del repositorio
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Paso 2: Login DockerHub
       - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Paso 3: Generar application.yml dinámico (ANTES DEL BUILD)
-      - name: Generate application.yml
-        run: |
-          mkdir -p src/main/resources
-          cat <<EOF > src/main/resources/application.yml
-          spring:
-            datasource:
-              url: jdbc:mysql://mysql:3306/cursos_db
-              username: root
-              password: 2785030
-            jpa:
-              hibernate:
-                ddl-auto: update
-              show-sql: true
-          aws:
-            accessKey: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            secretKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            sessionToken: ${{ secrets.AWS_SESSION_TOKEN }}
-            region: ${{ secrets.AWS_REGION }}
-          EOF
-
-      # Paso 4: Build imagen Docker
       - name: Build Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest ./cursos
 
-      # Paso 5: Push DockerHub
       - name: Push Docker Image
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
 
-      # Paso 6: AWS Credentials
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -66,25 +40,24 @@ jobs:
           aws-region: us-east-1
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
 
-      # Paso 7: SSH Key
       - name: Add SSH Key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      # Paso 8: Deploy EC2
-      - name: SSH commands to deploy
+      - name: Copy docker-compose.yml to EC2
+        run: |
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no cursos/docker-compose.yml ${{ secrets.USER_SERVER }}@${{ secrets.EC2_HOST }}:~/docker-compose.yml
+
+      - name: Deploy with docker-compose on EC2
         run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.USER_SERVER }}@${{ secrets.EC2_HOST }} << 'EOF'
 
           echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
-
-          docker stop my-app || true
-          docker rm my-app || true
-
-          docker run -d --name my-app -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
+          docker-compose down || true
+          docker-compose pull
+          docker-compose up -d
 
           EOF
